@@ -1,0 +1,38 @@
+{
+	"name" : "php-platform/web-session",
+	"type" : "library",
+	"keywords" : [
+		"session",
+		"restful session",
+		"php-platform"
+	],
+	"homepage" : "https://github.com/PHPPlatform/web-session",
+	"license" : "Apache-2.0",
+	"authors" : [{
+			"name" : "Raghavendra K R",
+			"email" : "krraghavendra@yahoo.co.in",
+			"homepage" : "http://krraghavendra.in",
+			"role" : "Software Developer"
+		}
+	],
+	"require" : {
+		"php" : ">=5.4",
+		"php-platform/session" : "~0.1"
+	},
+	"require-dev" : {
+		"phpunit/phpunit" : "~4.8",
+		"guzzlehttp/guzzle" : "~3.8",
+		"php-platform/mock-config" : "~0.1"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"PhpPlatform\\" : "src/"
+		}
+	},
+	"autoload-dev" : {
+		"psr-4" : {
+			"PhpPlatform\\Tests\\" : "tests/"
+		}
+	},
+	"minimum-stability" : "stable"
+}

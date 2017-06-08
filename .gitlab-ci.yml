@@ -1,0 +1,31 @@
+before_script:
+  - bash ci/docker_install.sh
+
+test_5.4:
+  image : phpplatform/php-apache-xdebug-composer:5.4
+  script :
+    - ./vendor/bin/phpunit -c ci/phpunit.xml
+
+test_5.5:
+  image : phpplatform/php-apache-xdebug-composer:5.5
+  script :
+    - ./vendor/bin/phpunit -c ci/phpunit.xml
+
+test_5.6:
+  image : phpplatform/php-apache-xdebug-composer:5.6
+  script :
+    - ./vendor/bin/phpunit -c ci/phpunit.xml
+
+test_7.0:
+  image : phpplatform/php-apache-xdebug-composer:7.0
+  script :
+    - ./vendor/bin/phpunit -c ci/phpunit.xml
+
+test_7.1:
+  image : phpplatform/php-apache-xdebug-composer:7.1
+  script :
+    - ./vendor/bin/phpunit -c ci/phpunit.xml
+
+after_script:
+  - bash <(curl -s https://codecov.io/bash) -t c09c03aa-44ab-4b07-934e-f20fd3a604c1
+  - cat /var/log/apache2/error.log

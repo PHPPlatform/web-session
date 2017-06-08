@@ -1,0 +1,7 @@
+/vendor/
+.buildpath
+.project
+.settings/
+/.htaccess
+/index.php
+/coverage.xml

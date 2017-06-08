@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<phpunit colors="true" bootstrap="../tests/autoload.php" >
+    <php>
+        <const name="APP_DOMAIN" value="http://localhost"/>
+        <const name="APP_PATH" value="web-session"/>
+        <const name="APP_COVERAGE" value="true"/>
+    </php>
+    <testsuites>
+        <testsuite name="php-platform\web-session">
+            <directory suffix=".php">../tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../src/</directory>
+        </whitelist>
+    </filter>
+</phpunit>
