@@ -8,7 +8,7 @@
     </php>
     <testsuites>
         <testsuite name="php-platform\web-session">
-            <directory suffix=".php">./tests</directory>
+            <directory suffix=".php">./tests/WebSession/ClientSide</directory>
         </testsuite>
     </testsuites>
     <filter>
