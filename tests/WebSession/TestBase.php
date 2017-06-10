@@ -25,6 +25,11 @@ abstract class TestBase extends \PHPUnit_Framework_TestCase {
 		// set PhpPlatform\WebSession\Session  as implenetation
 		MockSettings::setSettings('php-platform/session', "session.class", 'PhpPlatform\WebSession\Session');
 		
+		/**
+		 * @desc HACK : same file is used by SettingsCache , tests are run from root user and apache is run from www-data , causing permission issues to access this shared cache file
+		 */
+		chmod(sys_get_temp_dir().'/settingscache236512233125', 0777);
+		
 	}
 	
 	function setUp(){
