@@ -98,16 +98,16 @@
         },
         {
             "name": "php-platform/json-cache",
-            "version": "v0.1.1",
+            "version": "v0.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPPlatform/json-cache.git",
-                "reference": "0c6621fda8247c4720a74fbc9fdf42c4bb68cb1f"
+                "reference": "e9279ab977a16d586023c2b99d343f3d8c497d9a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPPlatform/json-cache/zipball/0c6621fda8247c4720a74fbc9fdf42c4bb68cb1f",
-                "reference": "0c6621fda8247c4720a74fbc9fdf42c4bb68cb1f",
+                "url": "https://api.github.com/repos/PHPPlatform/json-cache/zipball/e9279ab977a16d586023c2b99d343f3d8c497d9a",
+                "reference": "e9279ab977a16d586023c2b99d343f3d8c497d9a",
                 "shasum": ""
             },
             "require": {
@@ -139,7 +139,7 @@
                 "metadata",
                 "php-platform"
             ],
-            "time": "2017-01-19T14:15:38+00:00"
+            "time": "2017-03-31T09:46:34+00:00"
         },
         {
             "name": "php-platform/session",
