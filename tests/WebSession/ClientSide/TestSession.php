@@ -13,7 +13,7 @@ class TestSession extends TestBase {
 		
 		$this->assertTrue(isset($setCookieeParams["PhpPlatformSession"]));
 		$this->assertEquals("/", $setCookieeParams['path']);
-		$this->assertTrue($setCookieeParams['httponly']);
+		$this->assertTrue($setCookieeParams['HttpOnly']);
 	}
 	
 	function testSessionValues(){
@@ -127,6 +127,9 @@ class TestSession extends TestBase {
 			$keyValues = preg_split('/=/', trim($param));
 			if(count($keyValues) == 1){
 				$keyValues[] = true;
+			}
+			if(strtolower($keyValues[0]) == "httponly"){
+				$keyValues[0] = "HttpOnly";
 			}
 			$paramsArray[$keyValues[0]] = $keyValues[1];
 		}
