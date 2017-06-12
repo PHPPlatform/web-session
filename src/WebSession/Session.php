@@ -54,6 +54,7 @@ class Session extends Cache implements ISession{
 		$this->setLastAccessTime(time());
 		
 		// set cookie
+		$this->removeSessionSetCookieHeader($sessionCookieName);
 		setcookie($sessionCookieName,$sessionCookie,time()+$sessionTimeOut,$sessionPath,"",false,true);
 		
 	}
@@ -88,7 +89,7 @@ class Session extends Cache implements ISession{
 	public function reset($flag = 0) {
 		// create a new Session
 		$sessionCookieName = Settings::getSettings(Package::Name,"name");
-		$_COOKIE[$sessionCookieName] = "";
+		unset($_COOKIE[$sessionCookieName]);
 		$session = new Session();
 		
 		if($flag & self::RESET_COPY_OLD){
@@ -97,9 +98,10 @@ class Session extends Cache implements ISession{
 		
 		if($flag & self::RESET_DELETE_OLD){
 			$this->clear();
-			$this->setLastAccessTime(0);
 		}
-
+		
+		$this->setLastAccessTime(0);
+		
 	}
 	
 	private function setLastAccessTime($time){
@@ -109,6 +111,24 @@ class Session extends Cache implements ISession{
 			$lastAccessTime = array($cachePath=>$lastAccessTime);
 		}
 		Cache::getInstance()->setData($lastAccessTime);
+	}
+	
+	private function removeSessionSetCookieHeader($sessionName){
+		$headers = headers_list();
+		$cookiesToBeRestored = array();
+		foreach ($headers as $header){
+			if(strpos($header, "Set-Cookie:") === 0){
+				// SetCookiee Header
+				if(strpos($header, "Set-Cookie: $sessionName=") !== 0){
+					// not a session SetCookie header
+					$cookiesToBeRestored[] = $header;
+				}
+			}
+		}
+		header_remove("Set-Cookie");
+		foreach ($cookiesToBeRestored as $header){
+			header($header);
+		}
 	}
 
 }

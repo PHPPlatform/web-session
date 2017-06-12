@@ -9,20 +9,20 @@ class TestSession extends TestBase {
 	
 	function testCreateSession(){
 		$jsonContent = '{"name":"raaghu","children":[{"name":"shri"},{"name":"di"}],"spouse":{"name":"div"}}';
-		$setCookieeParams = $this->createSession($jsonContent);
+		$setCookieParams = $this->createSession($jsonContent);
 		
-		$this->assertTrue(isset($setCookieeParams["PhpPlatformSession"]));
-		$this->assertEquals("/", $setCookieeParams['path']);
-		$this->assertTrue($setCookieeParams['HttpOnly']);
+		$this->assertTrue(isset($setCookieParams["PhpPlatformSession"]));
+		$this->assertEquals("/", $setCookieParams['path']);
+		$this->assertTrue($setCookieParams['HttpOnly']);
 	}
 	
 	function testSessionValues(){
 		
 		$jsonContent = '{"name":"raaghu","children":[{"name":"shri"},{"name":"di"}],"spouse":{"name":"div"}}';
-		$setCookieeParams = $this->createSession($jsonContent);
+		$setCookieParams = $this->createSession($jsonContent);
 		
 		// assert session values are stored properly
-		$sessionCookie = array("name"=>"PhpPlatformSession","value"=>$setCookieeParams["PhpPlatformSession"]);
+		$sessionCookie = array("name"=>"PhpPlatformSession","value"=>$setCookieParams["PhpPlatformSession"]);
 		$this->assertSessionContains($sessionCookie, "name", "raaghu");
 		$this->assertSessionContains($sessionCookie, "children", '[{"name":"shri"},{"name":"di"}]');
 		$this->assertSessionContains($sessionCookie, "spouse", '{"name":"div"}');
@@ -37,10 +37,10 @@ class TestSession extends TestBase {
 	
 	function testDeleteSessionValue(){
 		$jsonContent = '{"name":"raaghu","children":[{"name":"shri"},{"name":"di"}],"spouse":{"name":"div"}}';
-		$setCookieeParams = $this->createSession($jsonContent);
+		$setCookieParams = $this->createSession($jsonContent);
 		
 		// assert session values are stored properly
-		$sessionCookie = array("name"=>"PhpPlatformSession","value"=>$setCookieeParams["PhpPlatformSession"]);
+		$sessionCookie = array("name"=>"PhpPlatformSession","value"=>$setCookieParams["PhpPlatformSession"]);
 		$this->assertSessionContains($sessionCookie, "name", "raaghu");
 		$this->assertSessionContains($sessionCookie, "children", '[{"name":"shri"},{"name":"di"}]');
 		$this->assertSessionContains($sessionCookie, "spouse", '{"name":"div"}');
@@ -82,10 +82,10 @@ class TestSession extends TestBase {
 	
 	function testClearSession(){
 		$jsonContent = '{"name":"raaghu","children":[{"name":"shri"},{"name":"di"}],"spouse":{"name":"div"}}';
-		$setCookieeParams = $this->createSession($jsonContent);
+		$setCookieParams = $this->createSession($jsonContent);
 		
 		// assert session values are stored properly
-		$sessionCookie = array("name"=>"PhpPlatformSession","value"=>$setCookieeParams["PhpPlatformSession"]);
+		$sessionCookie = array("name"=>"PhpPlatformSession","value"=>$setCookieParams["PhpPlatformSession"]);
 		$this->assertSessionContains($sessionCookie, "name", "raaghu");
 		$this->assertSessionContains($sessionCookie, "children", '[{"name":"shri"},{"name":"di"}]');
 		$this->assertSessionContains($sessionCookie, "spouse", '{"name":"div"}');
@@ -97,14 +97,62 @@ class TestSession extends TestBase {
 		$response = $client->send($request);
 		
 		// assert session cookie value is not changed after clear
-		$setCookieeParams = $this->parseSetCookieParams($response->getSetCookie());
-		$this->assertEquals($sessionCookie['value'], $setCookieeParams[$sessionCookie['name']]);
+		$setCookieParams = $this->parseSetCookieParams($response->getSetCookie());
+		$this->assertEquals($sessionCookie['value'], $setCookieParams[$sessionCookie['name']]);
 		
 		// assert all session values are are deleted
 		$this->assertSessionContains($sessionCookie, "name", "");
 		$this->assertSessionContains($sessionCookie, "children", '');
 		$this->assertSessionContains($sessionCookie, "spouse", '');
 		
+	}
+	
+	/**
+	 * @dataProvider resetSessionProvider
+	 * 
+	 * @param unknown $flag
+	 * @param unknown $sessionData
+	 */
+	function testResetSession($flag,$sessionData){
+		$jsonContent = '{"name":"raaghu","children":[{"name":"shri"},{"name":"di"}],"spouse":{"name":"div"}}';
+		$setCookieParams = $this->createSession($jsonContent);
+		
+		// assert session values are stored properly
+		$sessionCookie = array("name"=>"PhpPlatformSession","value"=>$setCookieParams["PhpPlatformSession"]);
+		$this->assertSessionContains($sessionCookie, "name", "raaghu");
+		$this->assertSessionContains($sessionCookie, "children", '[{"name":"shri"},{"name":"di"}]');
+		$this->assertSessionContains($sessionCookie, "spouse", '{"name":"div"}');
+		
+		// reset session
+		$client = new Client();
+		$request = $client->get(APP_DOMAIN.'/'.APP_PATH.'/tests/WebSession/Services/ResetSession.php?flag='.$flag);
+		$request->addCookie($sessionCookie['name'], $sessionCookie['value']);
+		$response = $client->send($request);
+		
+		// assert new session id is generated
+		$setCookieParamsAfterReset = $this->parseSetCookieParams($response->getSetCookie());
+		$this->assertNotEquals($sessionCookie['value'], $setCookieParamsAfterReset[$sessionCookie['name']]);
+		
+		// assert session values with old cookie after reset
+		$this->assertSessionContains($sessionCookie, "name", "");
+		$this->assertSessionContains($sessionCookie, "children", '');
+		$this->assertSessionContains($sessionCookie, "spouse", '');
+		
+		// assert session values with new cookie after reset
+		$sessionCookie["value"] = $setCookieParamsAfterReset["PhpPlatformSession"];
+		$this->assertSessionContains($sessionCookie, "name", $sessionData[0]);
+		$this->assertSessionContains($sessionCookie, "children", $sessionData[1]);
+		$this->assertSessionContains($sessionCookie, "spouse", $sessionData[2]);
+		
+	}
+	
+	function resetSessionProvider(){
+		return array(
+				array(0,array("","","")),
+				array(1,array("raaghu",'[{"name":"shri"},{"name":"di"}]','{"name":"div"}')),
+				array(2,array("","","")),
+				array(3,array("raaghu",'[{"name":"shri"},{"name":"di"}]','{"name":"div"}'))
+		);
 	}
 	
 	private function createSession($jsonContent){
@@ -115,9 +163,9 @@ class TestSession extends TestBase {
 		$this->assertEquals(200, $response->getStatusCode());
 		
 		$setCookie =  $response->getSetCookie();
-		$setCookieeParams = $this->parseSetCookieParams($setCookie);
+		$setCookieParams = $this->parseSetCookieParams($setCookie);
 		
-		return $setCookieeParams;
+		return $setCookieParams;
 	}
 	
 	private function parseSetCookieParams($setCookie){
