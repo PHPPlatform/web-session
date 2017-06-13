@@ -12,3 +12,5 @@ $input = json_decode($input,true);
 foreach ($input as $key=>$value){
 	$session->set($key, $value);
 }
+
+echo $session->getId();

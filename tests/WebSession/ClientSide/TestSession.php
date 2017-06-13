@@ -4,6 +4,9 @@ namespace PhpPlatform\Tests\WebSession\ClientSide;
 
 use PhpPlatform\Tests\WebSession\TestBase;
 use Guzzle\Http\Client;
+use PhpPlatform\Config\Settings;
+use PhpPlatform\WebSession\Package;
+use Guzzle\Http\Message\Header;
 
 class TestSession extends TestBase {
 	
@@ -129,9 +132,25 @@ class TestSession extends TestBase {
 		$request->addCookie($sessionCookie['name'], $sessionCookie['value']);
 		$response = $client->send($request);
 		
-		// assert new session id is generated
-		$setCookieParamsAfterReset = $this->parseSetCookieParams($response->getSetCookie());
-		$this->assertNotEquals($sessionCookie['value'], $setCookieParamsAfterReset[$sessionCookie['name']]);
+		// assert new session id is generated and other cookies are not affected
+		/**
+		 * @var Header $setCookieHeader
+		 */
+		$setCookieHeader = $response->getHeader('Set-Cookie');
+		
+		$i = 0;
+		foreach ($setCookieHeader->getIterator() as $header){
+			switch ($i){
+				case 0 :
+					$this->assertEquals("c1=v1; path=/mypath/", $header);break;
+				case 1 :
+					$this->assertEquals("c2=v2", $header);break;
+				case 2 :
+					$setCookieParamsAfterReset = $this->parseSetCookieParams($header);
+					$this->assertNotEquals($sessionCookie["value"], $setCookieParamsAfterReset[$sessionCookie["name"]]);
+			}
+			$i++;
+		}
 		
 		// assert session values with old cookie after reset
 		$this->assertSessionContains($sessionCookie, "name", "");
@@ -164,6 +183,10 @@ class TestSession extends TestBase {
 		
 		$setCookie =  $response->getSetCookie();
 		$setCookieParams = $this->parseSetCookieParams($setCookie);
+		
+		$sessionCookieName = Settings::getSettings(Package::Name,"name");
+		
+		$this->assertEquals($setCookieParams[$sessionCookieName], $response->getBody(true));
 		
 		return $setCookieParams;
 	}
