@@ -23,7 +23,7 @@ class Session extends Cache implements ISession{
 		if(array_key_exists($sessionCookieName, $_COOKIE)){
 			// cookie is set
 			$sessionCookie = $_COOKIE[$sessionCookieName];
-			$sessionLastAccessTime = Cache::getInstance()->getData(self::_lasAccessKey.'.'.$sessionCookie);
+			$sessionLastAccessTime = Cache::getInstance()->getData(self::$_lasAccessKey.'.'.$sessionCookie);
 			
 			if(isset($sessionLastAccessTime) && time() - $sessionLastAccessTime < $sessionTimeOut){
 				// session not expired
@@ -39,7 +39,7 @@ class Session extends Cache implements ISession{
 			while(isset($sessionLastAccessTime)){
 				// generate a non-colliding session cokiee
 				$sessionCookie = md5(microtime().$_SERVER['REMOTE_ADDR'].rand(1,1000));
-				$sessionLastAccessTime = Cache::getInstance()->getData(self::_lasAccessKey.'.'.$sessionCookie);
+				$sessionLastAccessTime = Cache::getInstance()->getData(self::$_lasAccessKey.'.'.$sessionCookie);
 			}
 			$sessionFileName = md5($sessionSalt.$sessionCookie);
 			$this->cacheFileName = $sessionFilePrefix.$sessionFileName;
@@ -106,7 +106,7 @@ class Session extends Cache implements ISession{
 	
 	private function setLastAccessTime($time){
 		$lastAccessTime = array($this->id=>$time);
-		$cachePaths = array_reverse(explode(".", self::_lasAccessKey));
+		$cachePaths = array_reverse(explode(".", self::$_lasAccessKey));
 		foreach ($cachePaths as $cachePath){
 			$lastAccessTime = array($cachePath=>$lastAccessTime);
 		}
