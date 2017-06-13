@@ -20,3 +20,22 @@ confugure ``PhpPlatform\WebSession\Session`` as the `session.class` in [php-plat
     }
 }
 ```
+
+## Configuration
+#### salt
+salt is used to encrypt session file name from actual session id
+```php
+$sessionFileName = md5($salt.$sessionId);
+```
+
+#### path
+path is the uri path on which this session cookie must be set, this value is sent as Set-Cookie's path parameter
+
+#### timeout
+Session timeout in seconds , this value is used to calculate Set-Cookie's expires and Max-Age parameters 
+
+#### name
+name of the session , this is the cookie name sent to the client
+
+#### sessionFilePrefix
+this is the prefix for session file names for this application , since all the session files are stored in same directory , this helps to categories the session files for each application
