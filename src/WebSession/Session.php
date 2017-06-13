@@ -7,7 +7,7 @@ use PhpPlatform\JSONCache\Cache;
 use PhpPlatform\Config\Settings;
 
 class Session extends Cache implements ISession{
-	private $_lasAccessKey = "php-platform.web-session.last-access";
+	static private $_lasAccessKey = "php-platform.web-session.last-access";
 	private $id = null;
 	private static $session = null;
 	
@@ -23,11 +23,11 @@ class Session extends Cache implements ISession{
 		if(array_key_exists($sessionCookieName, $_COOKIE)){
 			// cookie is set
 			$sessionCookie = $_COOKIE[$sessionCookieName];
-			$sessionLastAccessTime = Cache::getInstance()->getData($this->_lasAccessKey.'.'.$sessionCookie);
+			$sessionLastAccessTime = Cache::getInstance()->getData(self::_lasAccessKey.'.'.$sessionCookie);
 			
 			if(isset($sessionLastAccessTime) && time() - $sessionLastAccessTime < $sessionTimeOut){
 				// session not expired
-				$sessionFileName = md5($sessionSalt.$_COOKIE[$sessionCookieName]);
+				$sessionFileName = md5($sessionSalt.$sessionCookie);
 				$this->cacheFileName = $sessionFilePrefix.$sessionFileName;
 				$validSession = true;
 			}
@@ -39,7 +39,7 @@ class Session extends Cache implements ISession{
 			while(isset($sessionLastAccessTime)){
 				// generate a non-colliding session cokiee
 				$sessionCookie = md5(microtime().$_SERVER['REMOTE_ADDR'].rand(1,1000));
-				$sessionLastAccessTime = Cache::getInstance()->getData($this->_lasAccessKey.'.'.$sessionCookie);
+				$sessionLastAccessTime = Cache::getInstance()->getData(self::_lasAccessKey.'.'.$sessionCookie);
 			}
 			$sessionFileName = md5($sessionSalt.$sessionCookie);
 			$this->cacheFileName = $sessionFilePrefix.$sessionFileName;
@@ -106,7 +106,7 @@ class Session extends Cache implements ISession{
 	
 	private function setLastAccessTime($time){
 		$lastAccessTime = array($this->id=>$time);
-		$cachePaths = array_reverse(explode(".", $this->_lasAccessKey));
+		$cachePaths = array_reverse(explode(".", self::_lasAccessKey));
 		foreach ($cachePaths as $cachePath){
 			$lastAccessTime = array($cachePath=>$lastAccessTime);
 		}
@@ -118,7 +118,7 @@ class Session extends Cache implements ISession{
 		$cookiesToBeRestored = array();
 		foreach ($headers as $header){
 			if(strpos($header, "Set-Cookie:") === 0){
-				// SetCookiee Header
+				// SetCookie Header
 				if(strpos($header, "Set-Cookie: $sessionName=") !== 0){
 					// not a session SetCookie header
 					$cookiesToBeRestored[] = $header;
@@ -127,7 +127,7 @@ class Session extends Cache implements ISession{
 		}
 		header_remove("Set-Cookie");
 		foreach ($cookiesToBeRestored as $header){
-			header($header);
+			header($header,false);
 		}
 	}
 

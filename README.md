@@ -39,3 +39,11 @@ name of the session , this is the cookie name sent to the client
 
 #### sessionFilePrefix
 this is the prefix for session file names for this application , since all the session files are stored in same directory , this helps to categories the session files for each application
+
+## Scripts
+#### delete-expired-sessions
+
+to delete the expired session files , run this script (manually or in a cron job) in regular intervals
+```
+$ ./vendor/bin/delete-expired-sessions
+```
