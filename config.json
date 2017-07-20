@@ -1,6 +1,7 @@
 {
     "salt":"uppiginta ruchi bere illa, ida oppikondoru daddaralla",
     "path":"/",
+    "secure": false,
     "timeout":120,
     "name":"PhpPlatformSession",
     "sessionFilePrefix":""

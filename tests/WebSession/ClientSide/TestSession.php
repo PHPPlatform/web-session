@@ -7,6 +7,7 @@ use Guzzle\Http\Client;
 use PhpPlatform\Config\Settings;
 use PhpPlatform\WebSession\Package;
 use Guzzle\Http\Message\Header;
+use PhpPlatform\Mock\Config\MockSettings;
 
 class TestSession extends TestBase {
 	
@@ -172,6 +173,20 @@ class TestSession extends TestBase {
 				array(2,array("","","")),
 				array(3,array("raaghu",'[{"name":"shri"},{"name":"di"}]','{"name":"div"}'))
 		);
+	}
+	
+	function testSecureSession(){
+		MockSettings::setSettings(Package::Name, "secure", true);
+		$client = new Client();
+		$request = $client->get(APP_DOMAIN.'/'.APP_PATH.'/tests/WebSession/Services/SecureSession.php');
+		$response = $client->send($request);
+		
+		$this->assertEquals(200, $response->getStatusCode());
+		
+		$setCookie =  $response->getSetCookie();
+		
+		echo $setCookie;
+		
 	}
 	
 	private function createSession($jsonContent){
