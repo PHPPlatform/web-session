@@ -18,6 +18,7 @@ class Session extends Cache implements ISession{
 		$sessionTimeOut    = Settings::getSettings(Package::Name,'timeout');
 		$sessionSalt       = Settings::getSettings(Package::Name,'salt');
 		$sessionPath       = Settings::getSettings(Package::Name,'path');
+		$sessionSecurity   = Settings::getSettings(Package::Name,'secure');
 		
 		$validSession = false;
 		if(array_key_exists($sessionCookieName, $_COOKIE)){
@@ -55,7 +56,7 @@ class Session extends Cache implements ISession{
 		
 		// set cookie
 		$this->removeSessionSetCookieHeader($sessionCookieName);
-		setcookie($sessionCookieName,$sessionCookie,time()+$sessionTimeOut,$sessionPath,"",false,true);
+		setcookie($sessionCookieName,$sessionCookie,time()+$sessionTimeOut,$sessionPath,"",$sessionSecurity,true);
 		
 	}
 	
