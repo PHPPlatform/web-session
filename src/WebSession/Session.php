@@ -5,11 +5,13 @@ namespace PhpPlatform\WebSession;
 use PhpPlatform\Session\Session as ISession;
 use PhpPlatform\JSONCache\Cache;
 use PhpPlatform\Config\Settings;
+use PhpPlatform\Errors\Exceptions\Application\ProgrammingError;
 
 class Session extends Cache implements ISession{
 	static private $_lasAccessKey = "php-platform.web-session.last-access";
 	private $id = null;
 	private static $session = null;
+	private $isValid = false;
 	
 	protected function __construct(){
 		// check if session cokiee is present in the request
@@ -57,7 +59,7 @@ class Session extends Cache implements ISession{
 		// set cookie
 		$this->removeSessionSetCookieHeader($sessionCookieName);
 		setcookie($sessionCookieName,$sessionCookie,time()+$sessionTimeOut,$sessionPath,"",$sessionSecurity,true);
-		
+		$this->isValid = true;
 	}
 	
 	
@@ -72,29 +74,44 @@ class Session extends Cache implements ISession{
 	}
 
     public function getId() {
+    	if(!$this->isValid){
+    		throw new ProgrammingError('Invalid session instance, get a new instance from  PHPPlatform\Session\Factory::getSession()');
+    	}
     	return $this->id;
 	}
 
 	public function get($key) {
+		if(!$this->isValid){
+			throw new ProgrammingError('Invalid session instance, get a new instance from  PHPPlatform\Session\Factory::getSession()');
+		}
 		return parent::getData($key);
 	}
 
 	public function set($key, $value) {
+		if(!$this->isValid){
+			throw new ProgrammingError('Invalid session instance, get a new instance from  PHPPlatform\Session\Factory::getSession()');
+		}
 		return parent::setData(array($key=>$value));
 	}
 
 	public function clear() {
+		if(!$this->isValid){
+			throw new ProgrammingError('Invalid session instance, get a new instance from  PHPPlatform\Session\Factory::getSession()');
+		}
 		return parent::reset();
 	}
 
 	public function reset($flag = 0) {
+		if(!$this->isValid){
+			throw new ProgrammingError('Invalid session instance, get a new instance from  PHPPlatform\Session\Factory::getSession()');
+		}
 		// create a new Session
 		$sessionCookieName = Settings::getSettings(Package::Name,"name");
 		unset($_COOKIE[$sessionCookieName]);
-		$session = new Session();
+		self::$session = new Session();
 		
 		if($flag & self::RESET_COPY_OLD){
-			$session->setData($this->getData(""));
+			self::$session->setData($this->getData(""));
 		}
 		
 		if($flag & self::RESET_DELETE_OLD){
@@ -102,6 +119,7 @@ class Session extends Cache implements ISession{
 		}
 		
 		$this->setLastAccessTime(0);
+		$this->isValid = false;
 		
 	}
 	
