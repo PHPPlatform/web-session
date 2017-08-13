@@ -28,4 +28,3 @@ test_7.1:
 
 after_script:
   - bash <(curl -s https://codecov.io/bash) -t b48bded2-d785-41f3-a250-94072527b8ac
-  - cat /var/log/apache2/error.log
